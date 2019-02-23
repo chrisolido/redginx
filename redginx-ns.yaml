@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+apiVersion: v1
+metadata:
+    name: ingress-redginx
+    labels:
+        name: ingress-redginx

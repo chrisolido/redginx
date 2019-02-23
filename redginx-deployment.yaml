@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redginx
+  namespace: ingress-redginx
+spec:
+  replicas: 1
+  selector:
+    name: redginx
+  template:
+    metadata:
+      labels:
+        name: redginx
+        app: "redginx"
+        role: slave
+    spec:
+      containers:
+      - name: redis-slave
+        image: bitnami/redis:4.0.10
+        command: ["sh", "-c", "mkdir -p /opt/bitnami/redis/conf/ && mkdir -p /bitnami/redis/data/ && ln -s /tmp/redis/redis.conf /opt/bitnami/redis/conf/redis.conf && /run.sh"]
+        env:
+          - name: ALLOW_EMPTY_PASSWORD
+            value: "yes"
+          - name: REDIS_REPLICATION_MODE
+            value: "slave"
+          - name: REDIS_MASTER_HOST
+            value: "redis-master"
+        ports:
+          - containerPort: 6379
+        resources:
+            limits:
+              cpu: "0.1"
+        volumeMounts:
+          - name: unix-socket
+            mountPath: /var/run/redis
+          - name: redis-slave-config
+            mountPath: /tmp/redis
+      - name: nginx-lua
+        image: openresty/openresty:1.13.6.2-xenial
+        env:
+        ports:
+          - containerPort: 6379
+        resources:
+            limits:
+              cpu: "0.5"
+        volumeMounts:
+          - name: nginx-lua-config
+            mountPath: /usr/local/openresty/nginx/conf
+          - name: unix-socket
+            mountPath: /var/run/redis
+      volumes:
+      - name: nginx-lua-config
+        configMap:
+          name: redginx-nginx-lua-config
+      - name: redis-slave-config
+        configMap:
+          name: redginx-redis-slave-config
+      - name: unix-socket
+        emptyDir: {}
