@@ -7,6 +7,7 @@ For records in redis-master you should define every domain name with complete Ku
 
 Example:
 KEY: test.kubernetescluster.com
+
 VALUE: servicename.namespace.svc.cluster.local
 
 It deploys under ingress-redginx namespace.
@@ -15,12 +16,19 @@ Currently it works but it's still under development. It's open for your contribu
 Installation Instructions:
 
 kubectl apply -f ./redginx-ns.yaml
+
 kubectl create configmap redginx-nginx-lua-config --from-file nginx.conf -n ingress-redginx
+
 kubectl create configmap redginx-redis-slave-config --from-file redis.conf -n ingress-redginx
+
 kubectl apply -f ./redis-pvc.yaml
+
 kubectl apply -f ./redis-master.yaml
+
 kubectl apply -f ./redis-service.yaml
+
 kubectl apply -f ./redginx-deployment.yaml
+
 kubectl apply -f ./redginx-service.yaml
 
 Note: PVCs are configured for GKE, you should configure for your own kubernetes environment.
