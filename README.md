@@ -48,3 +48,4 @@ To Do:
 
 - Update Deployment Scripts to latest api versions
 - Update redis & nginx configs to make production ready
+  - Add https support
